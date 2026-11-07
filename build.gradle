@@ -1,0 +1,111 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
+}
+
+group = 'com.ocpatch'
+version = '1.0.0'
+base { archivesName = 'oc-lua54-fallback' }
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+def modId = 'oc_lua54_fallback'
+def modName = 'OpenComputers Lua 5.4 -> 5.3 Fallback'
+def modVersion = project.version
+
+neoForge {
+    version = project.neoforge_version
+
+    parchment {
+        mappingsVersion = project.mapping_version
+        minecraftVersion = project.minecraft_version
+    }
+
+    mods {
+        register(modId) {
+            sourceSet sourceSets.main
+        }
+    }
+
+    runs {
+        client {
+            client()
+            gameDirectory = file('run/client')
+        }
+        server {
+            server()
+            gameDirectory = file('run/server')
+            programArguments.addAll '--nogui'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'michiyo'
+        url = uri('https://maven.michiyo.me/releases/')
+    }
+}
+
+dependencies {
+    // Provided by OpenComputers at runtime; only needed to compile against.
+    compileOnly("li.cil.oc:opencomputers:${oc_version}") { transitive = false }
+    compileOnly("org.spongepowered:mixin:0.8.7")
+    annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
+
+    // Optional dev-run helper: drop the OpenComputers jar in libs/ to test.
+    var ocJar = file("libs/OpenComputers-${oc_version}.jar")
+    if (project.findProperty('withOpenComputers') != 'false' && ocJar.exists()) {
+        runtimeOnly files(ocJar)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Mod metadata
+// ---------------------------------------------------------------------------
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neoforge_version       : neoforge_version,
+            neoforge_version_range : neoforge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : modId,
+            mod_name               : modName,
+            mod_version            : modVersion,
+            oc_version             : oc_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'   : modId,
+                'Specification-Vendor'  : 'ocpatch',
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Vendor' : 'ocpatch',
+        ])
+    }
+}
+
+// Surface mixin apply/failure output when running the dev server.
+tasks.matching { it.name == 'runServer' || it.name == 'runClient' }.configureEach {
+    jvmArgs '-Dmixin.debug.verbose=true', '-Dmixin.debug.export=true'
+}

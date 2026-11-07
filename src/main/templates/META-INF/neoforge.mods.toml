@@ -1,0 +1,48 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="MIT"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+description='''
+Server-side workaround for the Lua 5.4 crash in OpenComputers
+([issue #142](https://github.com/PC-Logix/OpenComputers/issues/142)).
+
+OpenComputers' experimental **Lua 5.4** architecture runs on a JNI bridge whose
+native code frees a `lua_State` while `lua_pcall` is still using it. That is a
+use-after-free below the Java boundary: it cannot be caught, it is invisible to
+Java-side guards, and it kills the whole JVM with `SIGSEGV` in `lua_getfield`.
+
+This mod does not try to repair the natives. It makes every CPU that is
+configured for Lua 5.4 transparently run **Lua 5.3** instead, which uses the
+stable natives.
+
+*Applies to CPUs already placed in computers, racks and inventories - no world
+edits, no manual switching, no config.*
+'''
+
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="${neoforge_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="opencomputers"
+type="required"
+versionRange="*"
+ordering="AFTER"
+side="BOTH"

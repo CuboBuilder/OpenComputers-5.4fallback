@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "com.ocpatch.lua54fallback.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DriverCPUMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
