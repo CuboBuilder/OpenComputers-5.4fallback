@@ -165,11 +165,11 @@ cp /path/to/mods/OpenComputers-*.jar "libs/OpenComputers-1.9.4-5.jar"
 
 ### Should I use this or the crash-guard mod?
 
-Use this one. The guard mod
-([oc-lua54-patch](https://github.com/PC-Logix/OpenComputers/issues/142)) tried to
-block the crash from Java and **did not work**: the pointer is freed after any
-guard runs, so the check can never observe it. This mod avoids the defect
-entirely, which is the only reliable option short of rebuilding the natives.
+Use this one. The guard mod (`oc-lua54-patch`) tried to block the crash from
+Java and **did not work**: the pointer is freed *after* any guard has run, so the
+check can never observe it. `isOpen()` also still reports `true` for the stale
+pointer. This mod avoids the defect entirely, which is the only reliable option
+short of rebuilding the natives.
 
 ### Does this change my CPU items permanently?
 
