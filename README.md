@@ -237,7 +237,8 @@ not this project.
 
 ## Credits & licence
 
-- This mod's own code: **MIT** (see `LICENSE`). Chosen to match the permissive
+- This mod's own code: **MIT** (see `LICENSE`), © 2026
+  [CuboBuilder](https://github.com/CuboBuilder). Chosen to match the permissive
   terms of OpenComputers itself, so the two are compatible in every direction.
 - [OpenComputers: Rebooted](https://github.com/PC-Logix/OpenComputers) —
   MIT for code, CC0 for assets. This mod **contains no OpenComputers code or
