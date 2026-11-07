@@ -1,6 +1,11 @@
 MIT License
 
-Copyright (c) 2025 OpenComputers Lua 5.4 Patch contributors
+Copyright (c) 2025 OpenComputers Lua 5.4 Fallback contributors
+
+NOTE: This project is AI-generated and unmaintained. See README.md for the full
+disclaimer. This licence grants the same permissions as OpenComputers itself
+(MIT for code), so the two are compatible in both directions. No OpenComputers
+code or assets are redistributed in this project.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,7 +1,15 @@
 # OpenComputers Lua 5.4 → 5.3 Fallback
 
-> **Temporary workaround.** This exists only until the Lua 5.4 crash in
-> OpenComputers is fixed upstream. When it is, delete this mod.
+> ### ⚠ Unmaintained · AI-generated · use at your own risk
+>
+> This is a throwaway workaround written by an AI (a large language model) and
+> it **will not be maintained**. No support, no updates, no guarantees.
+>
+> **Its only goal is to stop you from losing access to your world** because of a
+> hard server crash. The proper fix belongs upstream in OpenComputers; once that
+> lands, delete this mod.
+>
+> Read the [Disclaimer](#disclaimer) before installing.
 
 A **server-side** addon for [OpenComputers: Rebooted](https://github.com/PC-Logix/OpenComputers)
 (NeoForge, Minecraft 1.21.1) that stops the Lua 5.4 architecture from killing
@@ -118,6 +126,25 @@ Mixing DriverCPUMixin from oc_lua54_fallback.mixins.json into li.cil.oc.integrat
 [oc-lua54-fallback] OpenComputers detected; CPUs set to Lua 5.4 will run Lua 5.3 instead.
 ```
 
+### Expected one-time error in the log
+
+On the first load after installing, you will likely see **one** message per
+affected computer:
+
+```
+[OpenComputers/]: Unexpected error loading a state of computer at (...).
+java.lang.Exception: ... LuaRuntimeException: trying to unpersist unknown type 10
+```
+
+**This is normal and harmless.** The saved Lua snapshot was written by Lua 5.4
+and contains a value type that 5.3 does not know. OpenComputers catches the
+error, discards the in-memory state and reboots the machine through the BIOS,
+keeping its components, disks and filesystem intact. After it saves again the
+snapshot is stored as 5.3 and the message will not return.
+
+The trade-off: that machine's **volatile** state (running program, variables) is
+lost once. Anything persistent survives.
+
 ### Checking a CPU
 
 Look at the CPU item's tooltip in-game. A CPU that was saved as *Lua 5.4* will
@@ -163,14 +190,6 @@ cp /path/to/mods/OpenComputers-*.jar "libs/OpenComputers-1.9.4-5.jar"
 
 ## FAQ
 
-### Should I use this or the crash-guard mod?
-
-Use this one. The guard mod (`oc-lua54-patch`) tried to block the crash from
-Java and **did not work**: the pointer is freed *after* any guard has run, so the
-check can never observe it. `isOpen()` also still reports `true` for the stale
-pointer. This mod avoids the defect entirely, which is the only reliable option
-short of rebuilding the natives.
-
 ### Does this change my CPU items permanently?
 
 No. The stored architecture tag is never written. The substitution happens when
@@ -189,10 +208,43 @@ future version fails loudly instead of silently doing nothing.
 
 ---
 
+## Disclaimer
+
+**This mod is AI-generated and unmaintained.**
+
+- It was written by a large language model. It has not been reviewed by a human
+  expert and comes with **no warranty of any kind**.
+- **It will not be maintained.** No bug fixes, no version updates, no support.
+  If OpenComputers changes, this mod may break or silently do nothing.
+- It is a **crash workaround, not a fix**. Its single purpose is to keep your
+  world accessible instead of having the server killed by a JVM access
+  violation. It does not repair the underlying defect in the OpenComputers
+  native libraries.
+- It works by **downgrading CPUs from Lua 5.4 to Lua 5.3**. If your scripts
+  depend on 5.4-only behaviour, they will behave differently. Read
+  [Side effects](#side-effects).
+- Tested only against the setup described above. **Back up your world before
+  installing.** No liability is accepted for lost data, broken worlds or
+  anything else.
+- Unaffiliated with, and not endorsed by, the OpenComputers maintainers.
+
+If a crash that this mod does not cover still occurs, the correct place to
+report it is
+[PC-Logix/OpenComputers](https://github.com/PC-Logix/OpenComputers/issues),
+not this project.
+
+---
+
 ## Credits & licence
 
-- Patch code: MIT (see `LICENSE`).
-- [OpenComputers](https://github.com/PC-Logix/OpenComputers) — MIT / CC0.
-- [OC-JNLua](https://github.com/MightyPirates/OC-JNLua) — where the defect lives.
+- This mod's own code: **MIT** (see `LICENSE`). Chosen to match the permissive
+  terms of OpenComputers itself, so the two are compatible in every direction.
+- [OpenComputers: Rebooted](https://github.com/PC-Logix/OpenComputers) —
+  MIT for code, CC0 for assets. This mod **contains no OpenComputers code or
+  assets**: it only references upstream class *names* at runtime through a
+  Mixin, which is permitted under MIT and does not create a derivative work.
+- [OC-JNLua](https://github.com/MightyPirates/OC-JNLua) — where the defect that
+  motivates this workaround lives.
 
-Unaffiliated with the OpenComputers maintainers.
+No OpenComputers files are redistributed here, so their copyright notices are
+not reproduced in this repository.

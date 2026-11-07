@@ -7,20 +7,23 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 description='''
-Server-side workaround for the Lua 5.4 crash in OpenComputers
+### UNMAINTAINED - AI-GENERATED - NO WARRANTY
+
+Server-side crash workaround for the Lua 5.4 bug in OpenComputers
 ([issue #142](https://github.com/PC-Logix/OpenComputers/issues/142)).
 
-OpenComputers' experimental **Lua 5.4** architecture runs on a JNI bridge whose
+OpenComputers' experimental Lua 5.4 architecture runs on a JNI bridge whose
 native code frees a `lua_State` while `lua_pcall` is still using it. That is a
-use-after-free below the Java boundary: it cannot be caught, it is invisible to
-Java-side guards, and it kills the whole JVM with `SIGSEGV` in `lua_getfield`.
+use-after-free below the Java boundary: it cannot be caught, and it kills the
+whole JVM with `SIGSEGV` in `lua_getfield`.
 
-This mod does not try to repair the natives. It makes every CPU that is
-configured for Lua 5.4 transparently run **Lua 5.3** instead, which uses the
-stable natives.
+This mod does not repair the natives. It makes every CPU configured for Lua 5.4
+transparently run **Lua 5.3** instead, which uses the stable natives.
 
-*Applies to CPUs already placed in computers, racks and inventories - no world
-edits, no manual switching, no config.*
+Its only purpose is to keep your world accessible instead of losing it to a
+hard crash. **Back up your world first.** Written by an AI, provided as-is,
+and not maintained or supported in any way. Unaffiliated with the
+OpenComputers maintainers.
 '''
 
 [[mixins]]
