@@ -125,8 +125,12 @@ log "Creating release ${TAG}"
 EXISTING_TAG="$(curl -sS -o /dev/null -w '%{http_code}' "${AUTH[@]}" \
     "${API}/repos/${OWNER}/${REPO_NAME}/releases/tags/${TAG}")"
 
+RELEASE_ID=""
 if [[ "${EXISTING_TAG}" == "200" ]]; then
-    echo "release ${TAG} already exists; skipping creation"
+    echo "release ${TAG} already exists; reusing it"
+    RELEASE_ID="$(curl -sS -f "${AUTH[@]}" \
+        "${API}/repos/${OWNER}/${REPO_NAME}/releases/tags/${TAG}" \
+        | sed -n 's/.*"id": *\([0-9]*\).*/\1/p' | head -1)"
 else
     RELEASE_BODY=$(cat <<'EOF'
 Server-side crash workaround for the Lua 5.4 bug in OpenComputers.
@@ -146,14 +150,24 @@ EOF
         echo "error: failed to create the release" >&2
         exit 1
     }
-    echo "release created"
+    RELEASE_ID="$(printf '%s' "${RELEASE_RESPONSE}" \
+        | sed -n 's/.*"id": *\([0-9]*\).*/\1/p' | head -1)"
+    echo "release created (id ${RELEASE_ID})"
 fi
 
+[[ -n "${RELEASE_ID}" ]] || { echo "error: could not determine release id" >&2; exit 1; }
+
+# Uploading by tag path is rejected by the uploads host; the numeric release id
+# is the documented form.
 log "Uploading ${JAR}"
-UPLOAD_URL="https://uploads.github.com/repos/${OWNER}/${REPO_NAME}/releases/tags/${TAG}/assets?name=$(basename "${JAR}")"
-curl -sS -f "${AUTH[@]}" \
-    -H "Content-Type: application/java-archive" \
-    -X POST "${UPLOAD_URL}" --data-binary "@${JAR}" >/dev/null && echo "asset uploaded"
+UPLOAD_URL="https://uploads.github.com/repos/${OWNER}/${REPO_NAME}/releases/${RELEASE_ID}/assets?name=$(basename "${JAR}")"
+if ! curl -sS -f "${AUTH[@]}" \
+        -H "Content-Type: application/java-archive" \
+        -X POST "${UPLOAD_URL}" --data-binary "@${JAR}" >/dev/null; then
+    echo "error: asset upload failed" >&2
+    exit 1
+fi
+echo "asset uploaded"
 
 log "Done"
 echo "repository: https://github.com/${OWNER}/${REPO_NAME}"
