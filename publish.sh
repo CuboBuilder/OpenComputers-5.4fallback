@@ -19,7 +19,7 @@ set -euo pipefail
 # Configuration
 # ---------------------------------------------------------------------------
 OWNER="${GITHUB_OWNER:-CuboBuilder}"
-REPO_NAME="${REPO_NAME:-oc-lua54-fallback}"
+REPO_NAME="${REPO_NAME:-OpenComputers-5.4fallback}"
 VISIBILITY="${VISIBILITY:-public}"
 TAG="${TAG:-v1.0.0}"
 JAR="build/libs/oc-lua54-fallback-1.0.0.jar"
